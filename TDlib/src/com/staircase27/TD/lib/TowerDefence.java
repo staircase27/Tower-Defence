@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -193,84 +195,95 @@ public final class TowerDefence {
         //records the updates to the route so can choose to accept or reject
         MapUpdate<Point, TwoItems<Integer, Set<Point>>> routeUpdate = new MapUpdate<Point, TwoItems<Integer, Set<Point>>>(route);
         Map<Point, TwoItems<Integer, Set<Point>>> newRoute = routeUpdate.getMap();
-        //nodes to process
-        SortedSet<TwoItems<Integer,Point>> open=new TreeSet<TwoItems<Integer, Point>>(comparator);
-        //update the removed node and add to list of nodes to process
-        newRoute.remove(blockedPoint);
-        open.add(new TwoItems<Integer, Point>(Integer.MAX_VALUE, blockedPoint));
-        //while nodes to process next node is processed
-        printDebug(blockedPoint, newRoute, null, open);
-        while(!open.isEmpty()){
-            TwoItems<Integer, Point> next = open.first();
-            open.remove(next);
-//            System.out.println(next);
-            // if length is still a valid length
-            if (){
-            //for each neighbour
-                for(Point neighbour:grid.getNeighbours(next.getB())){
-                    //if it is not blocked (same as has a route to as no extra nodes will be acessable)
-                    if(!blockedPoints.contains(neighbour)){
-                        //find the current data for the node
-                        TwoItems<Integer, Set<Point>> data = newRoute.get(neighbour);
-                        //remove this node from the routes to the neighbour as it is no longer giving the same length
-                        if(data!=null)
-                            data.getB().remove(next.getB());
-                        //if there are no routes to this neighbour of the correct length
-    //                    System.out.print(neighbour);
-    //                    System.out.print(data);
-                        if(data==null||data.getB().isEmpty()){
-                            //find the current best options
-                            Set<Point> bestFrom=new HashSet<Point>();
-                            int distance=Integer.MAX_VALUE-1;
-                            //for each potential best neighbour
-    //                        System.out.print(" - ");
-                            for(Point from:grid.getNeighbours(neighbour)){
-                                //check if a cell has a route to it, currently has this cell as it's only route to it and 
-                                //it gives a route that is either better or as good as current
-    //                            System.out.print(from);
-    //                            if(newRoute.containsKey(from))
-    //                                System.out.print(newRoute.get(from).getA());
-    //                            System.out.print(" ");
-                                if(newRoute.containsKey(from) && (!newRoute.get(from).getB().contains(neighbour)||newRoute.get(from).getB().size()!=1) && distance>=newRoute.get(from).getA()){
-                                    if(distance>newRoute.get(from).getA()){
-                                        bestFrom.clear();
-                                        distance=newRoute.get(from).getA();
-                                    }
-                                    bestFrom.add(from);
-                                }
-                            }
-    //                        System.out.print(" - ");
-    //                        System.out.print(distance+1);
-                            if((data==null&&distance+1!=Integer.MAX_VALUE)||(data!=null&&distance+1!=data.getA())){
-                                //remove current entry in open set if there is one
-                                if(data!=null){
-                                    open.remove(new TwoItems<Integer, Point>(newRoute.get(neighbour).getA(),neighbour));
-                                }else{
-                                    open.remove(new TwoItems<Integer, Point>(-1,neighbour));
-                                }
-                                //if didn't find a route remove the route to this cell
-                                if(distance==Integer.MAX_VALUE-1){
-                                    newRoute.remove(neighbour);
-                                    distance=-2;
-                                //else put the new route in the table;
-                                }else{
-                                    newRoute.put(neighbour, new TwoItems<Integer, Set<Point>>(distance+1, bestFrom));
-                                }
-                                for(Point from:bestFrom){
-                                    newRoute.get(from).getB().remove(neighbour);
-                                }
-                                //and add to the open nodes list
-                                open.add(new TwoItems<Integer, Point>(distance+1,neighbour));
-                            }
-                        }
-    //                    System.out.println();
-                    }
-                }
-            }else{
-                
-            }
-            printDebug(next.getB(), newRoute, null, open);
+        
+        Point end;
+        Iterator<Entry<Point, TwoItems<Integer, Set<Point>>>> it = newRoute.entrySet().iterator();
+        while(it.hasNext()){
+            Entry<Point, TwoItems<Integer, Set<Point>>> entry = it.next();
+            if(entry.getValue().getA()==0)
+                end=entry.getKey();
+            it.remove();
         }
+        generateRoute(blockedPoint, route);
+        
+        //nodes to process
+//        SortedSet<TwoItems<Integer,Point>> open=new TreeSet<TwoItems<Integer, Point>>(comparator);
+//        //update the removed node and add to list of nodes to process
+//        newRoute.remove(blockedPoint);
+//        open.add(new TwoItems<Integer, Point>(Integer.MAX_VALUE, blockedPoint));
+//        //while nodes to process next node is processed
+//        printDebug(blockedPoint, newRoute, null, open);
+//        while(!open.isEmpty()){
+//            TwoItems<Integer, Point> next = open.first();
+//            open.remove(next);
+////            System.out.println(next);
+//            // if length is still a valid length
+//            if (){
+//            //for each neighbour
+//                for(Point neighbour:grid.getNeighbours(next.getB())){
+//                    //if it is not blocked (same as has a route to as no extra nodes will be acessable)
+//                    if(!blockedPoints.contains(neighbour)){
+//                        //find the current data for the node
+//                        TwoItems<Integer, Set<Point>> data = newRoute.get(neighbour);
+//                        //remove this node from the routes to the neighbour as it is no longer giving the same length
+//                        if(data!=null)
+//                            data.getB().remove(next.getB());
+//                        //if there are no routes to this neighbour of the correct length
+//    //                    System.out.print(neighbour);
+//    //                    System.out.print(data);
+//                        if(data==null||data.getB().isEmpty()){
+//                            //find the current best options
+//                            Set<Point> bestFrom=new HashSet<Point>();
+//                            int distance=Integer.MAX_VALUE-1;
+//                            //for each potential best neighbour
+//    //                        System.out.print(" - ");
+//                            for(Point from:grid.getNeighbours(neighbour)){
+//                                //check if a cell has a route to it, currently has this cell as it's only route to it and 
+//                                //it gives a route that is either better or as good as current
+//    //                            System.out.print(from);
+//    //                            if(newRoute.containsKey(from))
+//    //                                System.out.print(newRoute.get(from).getA());
+//    //                            System.out.print(" ");
+//                                if(newRoute.containsKey(from) && (!newRoute.get(from).getB().contains(neighbour)||newRoute.get(from).getB().size()!=1) && distance>=newRoute.get(from).getA()){
+//                                    if(distance>newRoute.get(from).getA()){
+//                                        bestFrom.clear();
+//                                        distance=newRoute.get(from).getA();
+//                                    }
+//                                    bestFrom.add(from);
+//                                }
+//                            }
+//    //                        System.out.print(" - ");
+//    //                        System.out.print(distance+1);
+//                            if((data==null&&distance+1!=Integer.MAX_VALUE)||(data!=null&&distance+1!=data.getA())){
+//                                //remove current entry in open set if there is one
+//                                if(data!=null){
+//                                    open.remove(new TwoItems<Integer, Point>(newRoute.get(neighbour).getA(),neighbour));
+//                                }else{
+//                                    open.remove(new TwoItems<Integer, Point>(-1,neighbour));
+//                                }
+//                                //if didn't find a route remove the route to this cell
+//                                if(distance==Integer.MAX_VALUE-1){
+//                                    newRoute.remove(neighbour);
+//                                    distance=-2;
+//                                //else put the new route in the table;
+//                                }else{
+//                                    newRoute.put(neighbour, new TwoItems<Integer, Set<Point>>(distance+1, bestFrom));
+//                                }
+//                                for(Point from:bestFrom){
+//                                    newRoute.get(from).getB().remove(neighbour);
+//                                }
+//                                //and add to the open nodes list
+//                                open.add(new TwoItems<Integer, Point>(distance+1,neighbour));
+//                            }
+//                        }
+//    //                    System.out.println();
+//                    }
+//                }
+//            }else{
+//                
+//            }
+//            printDebug(next.getB(), newRoute, null, open);
+//        }
         return routeUpdate;
     }
     
