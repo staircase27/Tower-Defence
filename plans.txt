@@ -1,0 +1,71 @@
+Towers
+
+(H=hit,T=time:S=speed,default=health) (F=fire rate,T=target rate)
+                                                                                      Damage                   Rate    Range
+Missile - a basic bullet                                                             |1 per H                 1 F       1
+  Bullet - a standard bullet (more powerful than missile)                            |3 per H                 1 F       1
+    Heavy - a high damage and long range but slow reload bullet                      |7 per H                 1/8 F     1.3
+      Smart - as heavy but will track target and find a new one if it's target dies  |7 per H                 1/10 F     1.3
+      Sniper - very long range and powerful but very slow reload                     |10 per H                1/8 F      4 (should be roughly entire grid if tower on center)
+    Rapid - high fire rate but low damage per bullet                                 |1 per H                 3 F       1
+      Poison - high fire rate and may poison unit                                    |0.5 per H 25% 3 per T   3 F       1.1
+      Scatter - very very fast bullets that are scattered around the target          |0.1 per H               100 F     1.2 (0.1*? scatter)
+  Laser - a laser!                                                                   |1 per T                 1 T       1
+    Fast - a fast but short range laser                                              |1 per T                 3 T       0.7
+      Drain - drains energy (speed) from the target and slowes it almost to a stop   |1 per T (S) lasts time  3 T       0.7
+      Faster - same as fast but more damage and faster                               |1.2 per T               10 T      0.7
+    Strong - a longer range but slower to turn laser                                 |2 per T                 1/2 T     2
+      Xray - same as strong but doesn't stop on hitting an enemy                     |3 per T                 1/5 T     3.5
+      Shielder - destroys shields but nothing else                                   |4 per T (shields only)  1/2 T     2
+Area - does a little damage to any enemies in range                                  |0.1 per T
+  Damage - does more damage to any enemies in range                                  |0.5 per T
+    Slow - slows the enemies down                                                    |0.2 while in range (S)
+      Slower - slows the enemies down ever more                                      |0.5 while in range (S)
+      Confuse - confuses the enemies so they might go in the wrong direction         |70%
+    Damage2 - does more damage                                                       |1 per T
+      Damage3 - does even more damage                                                |1.5 per T
+      Weaken - weakens the enemies - makes any damage have more effect               |*+0.2 while in range
+  Boost - boosts the damage of any towers in range                                   |*+0.1
+    Strengthen - increases the damage                                                |*+0.2
+      Strengthen2 - increases the damage even more                                   |*+0.3
+      Collect - collects more energy from units when destroyed by tower in range     |*+0.5
+    Rate - Increases the fire rate                                                   |                        *+0.2
+      Rate2 - increases fire rate even more                                          |                        *+0.3
+      Range - increases the fire range                                               |                                  *+0.3
+      
+
+L=3,...
+Enemies?
+
+1 damage is 1 HP or 0.5 speed
+
+            HP         Speed     invulnerabilities
+Basic       L          1         shielder
+Fast        2.5+0.5L     5+0.5L    shielder
+Slow        2*L        0.5       shielder
+Poisonless  L          1         shielder,poison
+Shielded    L          1         shielder (x-ray affects even if shielded)
+   +Shield  L          1         x-ray
+Transparent 5+0.5*L    1         lasers
+Invisible   5+0.5*L    1         shielder - can not be target when invisible which is 50% of time if not hit
+Floater     L          1         shielder,*2 for all area effects, ignores blockages
+EMP         L          1         shielder,knocks out towers on death for a few secs
+Splitter    0.7*L      1         shielder, on death splits into 3 splits
+   Split    0.3*L      2         shielder
+
+
+Areas
+          can build? Damage
+	      can traverse?
+start     N   *
+end       N   *
+Standard  Y   Y
+blocked   N   N
+soft      N   Y
+raised    Y   N
+damage    N   Y      +1
+heal      N   Y      -1
+speed     N   Y      +1 S
+slow      N   Y      -1 S
+
+
