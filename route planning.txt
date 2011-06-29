@@ -1,0 +1,120 @@
+//not present or null mean infinity
+
+void UpdateVertex(HashMap<Point,Integer> route,HashMap<Point,Integer> rhs,TreeSet<TwoItems<Integer, Point>> Ul,HashMap<Point,Integer> Um,Point p){
+    if(route.containsKey(p)){
+        if((!rhs.containsKey(p))||route.get(p)!=rhs.get(p)){
+            k=route.get(p);
+            if(rhs.containsKey(p)&&rhs.get(p)<k)
+                k=rhs.get(p);
+            Ul.add(TwoItems<Integer, Point>(k,p));
+            Um.put(p,k);
+        }else{
+            Um.remove(p);
+        }
+    }else{
+        if(rhs.containsKey(p)){
+            k=rhs.get(p);
+            Ul.add(TwoItems<Integer, Point>(k,p));
+            Um.put(p,k);
+        }else{
+            Um.remove(p);
+        }
+    }
+}
+
+void ComputePath(HashMap<Point,Integer> route,HashMap<Point,Integer> rhs,TreeSet<TwoItems<Integer, Point>> Ul,HashMap<Point,Integer> Um){
+    while(!Ul.isEmpty()){
+        entry=Ul.pollFirst();
+        if(!(Um.containsKey(entry.getB()) && Um.get(entry.getB())==entry.getA()){
+            continue;
+        }
+        Um.remove(p);
+        p=entry.getB();
+        k_old=entry.getA();
+
+        k_new=Integer.MAX_VALUE;
+        if(route.containsKey(p))
+            k_new=route.get(p)
+        if(rhs.containsKey(p)&&rhs.get(p)<k_new)
+            k_new=rhs.get(p);
+        if(k_old<k_new){
+            Ul.add(TwoItems<Integer, Point>(k_new,p));
+            Um.put(p,k_new);
+        }else if(route.containsKey(p)&&rhs.containsKey(p)&&route.get(p)>rhs.get(p)){
+            route.put(u,rhs.get(u));
+            for(Point n:grid.getNeighbours(p)){
+                if(n!=p_end && !blockedPoints.contains(n))
+                    if(!(rhs.containsKey(n)&&rhs.get(n)<1+route.get(p)))
+                        rhs.put(n,1+route.get(p));
+                UpdateVertex(p);
+            }
+        }else{
+            g_old=route.get(p);
+            route.remove(p);
+            for(Point n:grid.getNeighbours(p)){
+                if(blockedPoints.contains(n)){
+                    rhs.remove(n);
+                }else{
+                    if(rhs(n)=1+g_old){
+                        new_rhs=Integer.MAX_VALUE;
+                        for(Point nn:grid.getNeighbours(n)){
+                            if(route.containsKey(nn)&&1+route.get(nn)<new_rhs){
+                                new_rhs=1+route.get(nn);
+                            }
+                        }
+                        if(new_rhs==Integer.MAX_VALUE)
+                            rhs.remove(n)
+                        else
+                            rhs.put(n,new_rhs);
+                    }
+                }
+                UpdateVertex(n)
+            }
+            new_rhs=Integer.MAX_VALUE;
+            for(Point nn:grid.getNeighbours(p)){
+                if(route.containsKey(nn)&&!blockedPoint.contains(p)&&1+route.get(nn)<new_rhs){
+                    new_rhs=1+route.get(nn);
+                }
+            }
+            if(new_rhs==Integer.MAX_VALUE)
+                rhs.remove(p)
+            else
+                rhs.put(p,new_rhs);
+            UpdateVertex(p)
+        }
+    }
+}
+
+void CalculatePath(U,rhs,g){
+    TreeSet<TwoItems<Integer, Point>> Ul=new new TreeSet<TwoItems<Integer, Point>>(comparator);
+    HashMap<Point,Integer> Um=new HashMap<Point,Integer>();
+    //the g and rhs values of all the points in the grid. not present is infinity.
+    HashMap<Point,Integer> route=new HashMap<Point,Integer>()
+    HashMap<Point,Integer> rhs=new HashMap<Point,Integer>()
+    rhs.put(p_end,0);
+    Ul.add(TwoItems<Integer, Point>(0,p_end));
+    Um.put(p_end,0);
+    ComputeShortestPath(route,rhs,Ul,Um);
+}
+
+void UpdateRouteBlocked(Point p){
+    blockedPoints.add(p);
+    rhs.remove(p);
+    UpdateVertex(u);
+    ComputeShortestPath(route,rhs,Ul,Um);
+}
+
+void UpdateRouteUnblocked(Point p){
+    blockedPoints.remove(p);
+    new_rhs=Integer.MAX_VALUE;
+    for(Point n:grid.getNeighbours(p)){
+        if(c(p,n)+g(n)<new_rhs)
+            new_rhs=1+g(n);
+    }
+    if(new_rhs=Integer.MAX_VALUE){
+        rhs.remove(p)
+    else
+        rhs.put(p,new_rhs);
+    UpdateVertex(p);
+    ComputeShortestPath(route,rhs,Ul,Um);
+}

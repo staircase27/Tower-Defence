@@ -11,34 +11,57 @@ pl.ion()
 ax.set_xlim(-1,11);
 ax.set_ylim(-1,11);
 
+
 def update(something):
-    print update.index;
     try:
-        a=np.loadtxt("C:/Users/Simon Armstrong/Documents/tower defence/TDlib/out"+str(update.index)+".txt",dtype=np.int32)
+        a=np.loadtxt("C:/Users/Simon Armstrong/Documents/tower defence/TDlib/outA"+str(update.index)+".txt",dtype=np.int32)
     except:
         return False;
-    ax.clear()
-    colours=["black","orange","red","blue","gray","pink","green"]
-    for row in a:
-        x,y,c,n=row[0:4]
-        vecs=row[4:]
-        for i in range(4):
-            if vecs[i*2]!=-1:
-                dx=vecs[i*2]-x;dy=vecs[i*2+1]-y
-                ax.add_patch(p.FancyArrow(x+dx*0.25,y+dy*0.25,dx*0.5,dy*0.5,width=0.002,length_includes_head=True,head_width=0.1,head_length=0.1))
-        string="X"
-        if n<100000:
-            string=str(n)
-        ax.text(x,y,string,color=colours[c],va="center",ha="center")
+    colours=["black","grey","blue","gray","red","orange","green"]
+    if update.lables==None:
+        update.lables={};
+        for row in a:
+            x,y,c,n,r=row[0:5]
+            string="X"
+            if n<100000:
+                string=str(n)
+            rstring="X"
+            if r<100000:
+                rstring=str(r)
+            string=string+" "+rstring;
+            update.lables[(x,y)]=ax.text(x,y,string,color=colours[c],va="center",ha="center")
 
-    fig.canvas.draw_idle()
-    update.index+=1
+        fig.canvas.draw_idle()
+
+        print update.index;
+        update.index+=1
+    else:
+        for row in a:
+            x,y,c,n,r=row[0:5]
+            string="X"
+            if n<100000:
+                string=str(n)
+            rstring="X"
+            if r<100000:
+                rstring=str(r)
+            string=string+" "+rstring;
+            if update.lables[(x,y)].get_text()!=string:
+                update.lables[(x,y)].set_text(string);
+            if update.lables[(x,y)].get_color()!=colours[c]:
+                update.lables[(x,y)].set_color(colours[c]);
+
+        fig.canvas.draw_idle()
+
+        print update.index;
+        update.index+=1
     
-update.index=300
+update.index=0
+update.lables=None;
+
 
 update(0);
 
 import wx
-#wx.EVT_IDLE(wx.GetApp(), update)
-wx.EVT_KEY_DOWN(wx.GetApp(), update)
+wx.EVT_IDLE(wx.GetApp(), update)
+#wx.EVT_KEY_DOWN(wx.GetApp(), update)
 pl.show()

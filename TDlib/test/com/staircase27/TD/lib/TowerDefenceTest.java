@@ -66,6 +66,7 @@ public class TowerDefenceTest {
         instance.initialise();
         assertTrue(instance.blockedPoints.isEmpty());
         assertTrue(instance.routes.isEmpty());
+        assertTrue(instance.rhss.isEmpty());
         HashMap<Point, Areas> areas=new HashMap<Point, TowerDefence.Areas>();
         areas.put(new Point(1,1), Areas.END);
         areas.put(new Point(3,3), Areas.BLOCKED);
@@ -78,6 +79,7 @@ public class TowerDefenceTest {
         assertTrue(instance.blockedPoints.contains(new Point(5,5)));
         assertEquals(instance.routes.size(), 1);
         assertTrue(instance.routes.containsKey(new Point(1,1)));
+        assertTrue(instance.rhss.containsKey(new Point(1,1)));
     }
 
     /**
@@ -126,10 +128,11 @@ public class TowerDefenceTest {
     public void testGenerateRoute() {
         System.out.println("generateRoute");
         Point end = new Point(0,0);
-        HashMap<Point, TwoItems<Integer, Set<Point>>> route = new HashMap<Point, TwoItems<Integer, Set<Point>>>();
+        HashMap<Point, Integer> route = new HashMap<Point, Integer>();
+        HashMap<Point, Integer> rhs = new HashMap<Point, Integer>();
         TowerDefence instance = new TowerDefence(new SquareGrid(10, 10), new HashMap<Point, TowerDefence.Areas>(),false);
         instance.initialise();
-        instance.generateRoute(end, route);
+        instance.generateRoute(end, route, rhs);
         assertEquals(route.size(), 100);
     }
 
@@ -188,11 +191,11 @@ public class TowerDefenceTest {
         
         Point blocked=new Point(4,2);
         instance.blockedPoints.add(blocked);
-        MapUpdate<Point, TwoItems<Integer, Set<Point>>> update = instance.updateRouteBlocked(blocked, instance.routes.get(end));
+        MapUpdate<Point, Integer> update = instance.updateRouteBlocked(blocked, end, instance.routes.get(end), instance.rhss.get(end));
         update.update();
         blocked=new Point(4,7);
         instance.blockedPoints.add(blocked);
-        update=instance.updateRouteBlocked(blocked, instance.routes.get(end));
+        update=instance.updateRouteBlocked(blocked, end, instance.routes.get(end), instance.rhss.get(end));
         update.update();
     }
 
@@ -251,15 +254,15 @@ public class TowerDefenceTest {
         
         Point blocked=new Point(4,2);
         instance.blockedPoints.add(blocked);
-        Map<Point, MapUpdate<Point, TwoItems<Integer, Set<Point>>>> update = instance.updateRoutesBlocked(blocked);
-        for(Entry<Point, MapUpdate<Point, TwoItems<Integer, Set<Point>>>> entry:update.entrySet()){
+        Map<Point, MapUpdate<Point, Integer>> update = instance.updateRoutesBlocked(blocked);
+        for(Entry<Point, MapUpdate<Point, Integer>> entry:update.entrySet()){
             entry.getValue().update();
         }
         
         Point blocked2 = new Point(4,7);
         instance.blockedPoints.add(blocked2);
         update=instance.updateRoutesBlocked(blocked2);
-        for(Entry<Point, MapUpdate<Point, TwoItems<Integer, Set<Point>>>> entry:update.entrySet()){
+        for(Entry<Point, MapUpdate<Point, Integer>> entry:update.entrySet()){
             entry.getValue().update();
         }
     }
@@ -328,15 +331,15 @@ public class TowerDefenceTest {
         
         Point blocked=new Point(4,2);
         instance.blockedPoints.add(blocked);
-        Map<Point, MapUpdate<Point, TwoItems<Integer, Set<Point>>>> update = instance.updateRoutesBlocked(blocked);
-        for(Entry<Point, MapUpdate<Point, TwoItems<Integer, Set<Point>>>> entry:update.entrySet()){
+        Map<Point, MapUpdate<Point, Integer>> update = instance.updateRoutesBlocked(blocked);
+        for(Entry<Point, MapUpdate<Point, Integer>> entry:update.entrySet()){
             entry.getValue().update();
         }
         
         Point blocked2 = new Point(4,7);
         instance.blockedPoints.add(blocked2);
         update=instance.updateRoutesBlocked(blocked2);
-        for(Entry<Point, MapUpdate<Point, TwoItems<Integer, Set<Point>>>> entry:update.entrySet()){
+        for(Entry<Point, MapUpdate<Point, Integer>> entry:update.entrySet()){
             entry.getValue().update();
         }
         
@@ -355,7 +358,7 @@ public class TowerDefenceTest {
         Point unblockedPoint = null;
         HashMap<Point, TwoItems<Integer, Set<Point>>> route = null;
         TowerDefence instance = null;
-        instance.updateRouteUnblocked(unblockedPoint, route);
+        //instance.updateRouteUnblocked(unblockedPoint, route);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

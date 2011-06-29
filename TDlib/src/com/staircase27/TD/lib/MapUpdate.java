@@ -4,6 +4,7 @@
  */
 package com.staircase27.TD.lib;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,18 +19,40 @@ import java.util.Set;
  * @param <V> type of the values
  * @author Simon Armstrong
  */
-public class MapUpdate<K,V>{
+public final class MapUpdate<K,V>{
 
     private Map<K,V> original;
     private Map<K,V> updates=new HashMap<K, V>();
     private Map<K,V> additions=new HashMap<K, V>();
     private Set<K> removals=new HashSet<K>();
+    private Set<MapUpdate<?,?>> linked=new HashSet<MapUpdate<?, ?>>(Arrays.asList(new MapUpdate<?, ?>[]{this}));
     
     public MapUpdate(Map<K,V> original){
         this.original=original;
     }
+
+    public MapUpdate(Map<K,V> original,MapUpdate<?,?> link){
+        this(original);
+        link(link);
+    }
+    
+    public void link(MapUpdate<?,?> link){
+        link.linked.addAll(linked);
+        linked=link.linked;
+    }
+    
+    public void unlink(){
+        linked.remove(this);
+        this.linked=new HashSet<MapUpdate<?, ?>>(Arrays.asList(new MapUpdate<?, ?>[]{this}));
+    }
     
     public void update(){
+        for(MapUpdate<?,?> update:linked){
+            update.doUpdate();
+        }
+    }
+    
+    private void doUpdate(){
         original.putAll(updates);
         original.putAll(additions);
         original.keySet().removeAll(removals);
