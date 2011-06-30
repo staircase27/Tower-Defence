@@ -55,7 +55,7 @@ def update(something):
         print update.index;
         update.index+=1
     
-update.index=0
+update.index=70
 update.lables=None;
 
 

@@ -20,4 +20,5 @@ public interface Grid extends Iterable<Point> {
     public Point2D.Double getPointLocation(Point point);
     public Point getPointAt(Point2D.Double location);
     public Iterator<Point> getAllPoints();
+    public double getStrightness(Point previous, Point current, Point next);
 }

@@ -14,7 +14,11 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeSet;
 
 /**
@@ -27,7 +31,7 @@ public final class TowerDefence {
 
         START, END, BLOCKED, BOOST, RAISED
     }
-    final Grid grid;
+    public final Grid grid;
     HashMap<Point, BaseTower> towers = new HashMap<Point, BaseTower>();
     HashMap<Point, Areas> areas;
     HashSet<Point> blockedPoints;
@@ -48,7 +52,7 @@ public final class TowerDefence {
         //generateRoutes();
     }
 
-    public void initialise() {
+    void initialise() {
         blockedPoints = new HashSet<Point>();
         routes = new HashMap<Point, HashMap<Point, Integer>>();
         rhss = new HashMap<Point, HashMap<Point, Integer>>();
@@ -83,8 +87,7 @@ public final class TowerDefence {
         }
     }
     
-    Comparator<TwoItems<Integer, Point>> comparator = new Comparator<TwoItems<Integer, Point>>() {
-
+    public static final Comparator<TwoItems<Integer, Point>> comparator = new Comparator<TwoItems<Integer, Point>>() {
         @Override
         public int compare(TwoItems<Integer, Point> o1, TwoItems<Integer, Point> o2) {
             int value = o1.getA().compareTo(o2.getA());
@@ -98,9 +101,8 @@ public final class TowerDefence {
         }
     };
     
-    String filebase = "outA";
+    private String filebase = "outA";
     int index = 0;
-
     /**
      * outputs the data from the route planning to a file as:
      * x y \t type \t distance \t rhs
@@ -110,8 +112,8 @@ public final class TowerDefence {
      * @param rhs
      * @param U
      */
-    public void printDebug(Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
-        if (!false) {
+    void printDebug(Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
+        if (!true) {
             return;
         }
         try {
@@ -153,7 +155,7 @@ public final class TowerDefence {
         index++;
     }
 
-    void UpdateVertex(Map<Point, Integer> route, Map<Point, Integer> rhs, TreeSet<TwoItems<Integer, Point>> Ul, Map<Point, Integer> Um, Point p) {
+    private void UpdateVertex(Map<Point, Integer> route, Map<Point, Integer> rhs, TreeSet<TwoItems<Integer, Point>> Ul, Map<Point, Integer> Um, Point p) {
         if (route.containsKey(p)) {
             if ((!rhs.containsKey(p)) || route.get(p) != rhs.get(p)) {
                 int k = route.get(p);
@@ -176,10 +178,10 @@ public final class TowerDefence {
         }
     }
     
-    TreeSet<TwoItems<Integer, Point>> Ul = new TreeSet<TwoItems<Integer, Point>>(comparator);
-    HashMap<Point, Integer> Um = new HashMap<Point, Integer>();
+    private TreeSet<TwoItems<Integer, Point>> Ul = new TreeSet<TwoItems<Integer, Point>>(comparator);
+    private HashMap<Point, Integer> Um = new HashMap<Point, Integer>();
 
-    void ComputePath(Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs, TreeSet<TwoItems<Integer, Point>> Ul, Map<Point, Integer> Um) {
+    private void ComputePath(Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs, TreeSet<TwoItems<Integer, Point>> Ul, Map<Point, Integer> Um) {
         while (!Ul.isEmpty()) {
             TwoItems<Integer, Point> entry = Ul.pollFirst();
             if (!(Um.containsKey(entry.getB()) && Um.get(entry.getB()) == entry.getA())) {
@@ -253,7 +255,7 @@ public final class TowerDefence {
         }
     }
 
-    public void generateRoute(Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
+    void generateRoute(Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
         //the g and rhs values of all the points in the grid. not present is infinity.
         rhs.put(p_end, 0);
         Ul.add(new TwoItems<Integer, Point>(0, p_end));
@@ -262,7 +264,7 @@ public final class TowerDefence {
         ComputePath(p_end, route, rhs, Ul, Um);
     }
 
-    public MapUpdate<Point, Integer> updateRouteBlocked(Point blockedPoint, Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
+    MapUpdate<Point, Integer> updateRouteBlocked(Point blockedPoint, Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
         //records the updates to the route so can choose to accept or reject
         MapUpdate<Point, Integer> routeUpdate = new MapUpdate<Point, Integer>(route);
         Map<Point, Integer> newRoute = routeUpdate.getMap();
@@ -277,7 +279,7 @@ public final class TowerDefence {
         return routeUpdate;
     }
 
-    public void updateRouteUnblocked(Point unblockedPoint, Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
+    void updateRouteUnblocked(Point unblockedPoint, Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
         blockedPoints.remove(unblockedPoint);
         int new_rhs = Integer.MAX_VALUE;
         for (Point n : grid.getNeighbours(unblockedPoint)) {
@@ -293,5 +295,32 @@ public final class TowerDefence {
         UpdateVertex(route, rhs, Ul, Um, unblockedPoint);
         printDebug(unblockedPoint, route, rhs, Um);
         ComputePath(p_end, route, rhs, Ul, Um);
+    }
+    
+    
+    private Random rand=new Random();
+    public Point getNextPoint(Point target,Point current,Point previous){
+        List<TwoItems<Double,Point>> nexts=new LinkedList<TwoItems<Double, Point>>();
+        HashMap<Point, Integer> route = routes.get(target);
+        Integer distance = route.get(current);
+        double total=0;
+        for(Point n:grid.getNeighbours(current)){
+            if(route.containsKey(n)&&route.get(n)==distance-1){
+                if(previous==null)
+                    total+=1;
+                else
+                    total+=2+grid.getStrightness(previous,current,n);
+                nexts.add(new TwoItems<Double, Point>(total, n));
+            }
+        }
+        double choice=rand.nextDouble()*total;
+        Iterator<TwoItems<Double,Point>> it=nexts.iterator();
+        while(it.hasNext()){
+            TwoItems<Double, Point> next = it.next();
+            if(next.getA()>choice){
+                return next.getB();
+            }
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@
  */
 package com.staircase27.TD.lib;
 
+import java.awt.Point;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,6 +64,10 @@ public final class MapUpdate<K,V>{
         if(mapView==null)
             mapView=new MapView();
         return mapView;
+    }
+
+    public boolean removed(K k) {
+        return removals.contains(k);
     }
     
     private class MapView implements Map<K,V>{

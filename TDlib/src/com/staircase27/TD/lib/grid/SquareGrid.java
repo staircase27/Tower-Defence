@@ -72,7 +72,7 @@ public class SquareGrid implements Grid{
     public Iterator<Point> iterator() {
         return getAllPoints();
     }
-    
+
     private class AllPointsIterator implements Iterator<Point>{
 
         int x=0;
@@ -100,4 +100,9 @@ public class SquareGrid implements Grid{
         
     } 
     
+    @Override
+    public double getStrightness(Point p, Point c, Point n) {
+        double dir=(c.x-p.x)*(n.x-c.x)+(c.y-p.y)*(n.y-c.y);
+        return dir/Math.sqrt(((c.x-p.x)*(c.x-p.x)+(c.y-p.y)*(c.y-p.y))*((n.x-c.x)*(n.x-c.x)+(n.y-c.y)*(n.y-c.y)));
+    }
 }
