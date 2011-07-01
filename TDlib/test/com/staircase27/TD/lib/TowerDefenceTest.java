@@ -4,6 +4,10 @@
  */
 package com.staircase27.TD.lib;
 
+import com.staircase27.TD.lib.grid.Grid;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import com.staircase27.TD.lib.TowerDefence.Areas;
 import com.staircase27.TD.lib.grid.SquareGrid;
 import com.staircase27.TD.lib.lib.TwoItems;
@@ -367,6 +371,61 @@ public class TowerDefenceTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
+    
+    private String filebase = "outB";
+    int index = 0;
+    /**
+     * outputs the data from the route planning to a file as:
+     * x y \t type \t distance \t rhs
+     * where type is 0 if blocked, 2 if on the U list and 1 otherwise or the above +3 if hilighted.
+     * @param hilight
+     * @param route
+     * @param rhs
+     * @param U
+     */
+    void printDebug(Grid grid,Set<Point> blockedPoints, Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
+        if (!true) {
+            return;
+        }
+        try {
+            BufferedWriter out;
+            out = new BufferedWriter(new FileWriter(filebase + index + ".txt"));
+            for (Point point : grid) {
+                if (!grid.isValid(point)) {
+                    System.out.println("YARG");
+                }
+                out.write(point.x + " " + point.y + "\t");
+                int type = 1;
+                if (blockedPoints.contains(point)) {
+                    type = 0;
+                } else if (U.containsKey(point)) {
+                    type = 2;
+                }
+                if (point.x == hilight.x && point.y == hilight.y) {
+                    type += 3;
+                }
+                out.write("" + type + " ");
+
+                int distance = Integer.MAX_VALUE;
+                if (route.containsKey(point)) {
+                    distance = route.get(point);
+                }
+                out.write(distance + "\t");
+                distance = Integer.MAX_VALUE;
+                if (rhs.containsKey(point)) {
+                    distance = rhs.get(point);
+                }
+                out.write(distance + "\t");
+                out.write("\n");
+            }
+            out.flush();
+            out.close();
+        } catch (IOException ex) {
+            System.out.println("Oh dear");
+        }
+        index++;
+    }
+    
 
     /**
      * Test of getNextPoint method, of class TowerDefence.
@@ -452,7 +511,7 @@ public class TowerDefenceTest {
         int i=0;
         System.out.println(instance.index);
         while(!end.equals(curr)){
-            instance.printDebug(next, instance.routes.get(end), path2,path2);
+            printDebug(instance.grid,instance.blockedPoints,next, instance.routes.get(end), path2,path2);
             prev=curr;
             curr=next;
             next=instance.getNextPoint(end, curr, prev);
@@ -467,7 +526,7 @@ public class TowerDefenceTest {
         next=new Point(9,9);
         path2.clear();
 
-        for(int j=0;j<100;j++){
+        for(int j=0;j<200;j++){
             if(Math.random()<0.5){
                 if(blockable.isEmpty())
                     continue;
@@ -482,6 +541,7 @@ public class TowerDefenceTest {
                 update.get(end).update();
                 blockable.remove(0);
                 blocked.add(p);
+                printDebug(instance.grid,instance.blockedPoints,p, instance.routes.get(end), path2,path2);
             }else{
                 if(blocked.isEmpty())
                     continue;
@@ -491,21 +551,23 @@ public class TowerDefenceTest {
                 blockable.add(p);
                 instance.blockedPoints.remove(p);
                 instance.updateRoutesUnblocked(p);
+                printDebug(instance.grid,instance.blockedPoints,p, instance.routes.get(end), path2,path2);
             }
-            for(int k=0;k<4;k++){
+            for(int k=0;k<3;k++){
                 if(end.equals(curr)||curr==null){
                     curr=null;
                     prev=null;
                     next=new Point(9,9);
                     path2.clear();
+                    i=0;
                 }else{
                     next=instance.getNextPoint(end, curr, prev);
                 }
-                System.out.println(next);
                 prev=curr;
                 curr=next;
                 path2.put(curr,i++);
-                instance.printDebug(curr, instance.routes.get(end), path2, path2);
+                System.out.println(curr);
+                printDebug(instance.grid,instance.blockedPoints,next, instance.routes.get(end), path2,path2);
             }
         }
     }
