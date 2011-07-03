@@ -53,18 +53,6 @@ public class TowerDefenceTest {
     public void tearDown() {
     }
 
-
-    /**
-     * Test of constructor method, of class TowerDefence.
-     */
-    @Test
-    public void testConstructor() {
-        System.out.println("constructor");
-        TowerDefence instance = new TowerDefence(new SquareGrid(10, 10), new HashMap<Point, TowerDefence.Areas>());
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
     /**
      * Test of initialise method, of class TowerDefence.
      */
@@ -127,7 +115,6 @@ public class TowerDefenceTest {
         instance = new TowerDefence(new SquareGrid(10, 10), areas,false);
         instance.initialise();
         instance.generateRoutes();
-        // TODO review the generated test code and remove the default call to fail.
     }
 
     /**
@@ -150,7 +137,7 @@ public class TowerDefenceTest {
      */
     @Test
     public void testUpdateRouteBlocked() {
-        System.out.println("generateRoutes");
+        System.out.println("updateRouteBlocked");
         TowerDefence instance;
         HashMap<Point, Areas> areas=new HashMap<Point, TowerDefence.Areas>();
         Point end=new Point(0,0);
@@ -213,7 +200,7 @@ public class TowerDefenceTest {
      */
     @Test
     public void testUpdateRoutesBlocked() {
-        System.out.println("generateRoutes");
+        System.out.println("updateRoutesBlocked");
         TowerDefence instance;
         HashMap<Point, Areas> areas=new HashMap<Point, TowerDefence.Areas>();
         Point end=new Point(0,0);
@@ -290,7 +277,7 @@ public class TowerDefenceTest {
      */
     @Test
     public void testUpdateRoutesUnblocked() {
-        System.out.println("generateRoutes");
+        System.out.println("updateRoutesBlocked");
         TowerDefence instance;
         HashMap<Point, Areas> areas=new HashMap<Point, TowerDefence.Areas>();
         Point end=new Point(0,0);
@@ -371,61 +358,6 @@ public class TowerDefenceTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-    
-    private String filebase = "outB";
-    int index = 0;
-    /**
-     * outputs the data from the route planning to a file as:
-     * x y \t type \t distance \t rhs
-     * where type is 0 if blocked, 2 if on the U list and 1 otherwise or the above +3 if hilighted.
-     * @param hilight
-     * @param route
-     * @param rhs
-     * @param U
-     */
-    void printDebug(Grid grid,Set<Point> blockedPoints, Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
-        if (!true) {
-            return;
-        }
-        try {
-            BufferedWriter out;
-            out = new BufferedWriter(new FileWriter(filebase + index + ".txt"));
-            for (Point point : grid) {
-                if (!grid.isValid(point)) {
-                    System.out.println("YARG");
-                }
-                out.write(point.x + " " + point.y + "\t");
-                int type = 1;
-                if (blockedPoints.contains(point)) {
-                    type = 0;
-                } else if (U.containsKey(point)) {
-                    type = 2;
-                }
-                if (point.x == hilight.x && point.y == hilight.y) {
-                    type += 3;
-                }
-                out.write("" + type + " ");
-
-                int distance = Integer.MAX_VALUE;
-                if (route.containsKey(point)) {
-                    distance = route.get(point);
-                }
-                out.write(distance + "\t");
-                distance = Integer.MAX_VALUE;
-                if (rhs.containsKey(point)) {
-                    distance = rhs.get(point);
-                }
-                out.write(distance + "\t");
-                out.write("\n");
-            }
-            out.flush();
-            out.close();
-        } catch (IOException ex) {
-            System.out.println("Oh dear");
-        }
-        index++;
-    }
-    
 
     /**
      * Test of getNextPoint method, of class TowerDefence.
@@ -437,53 +369,29 @@ public class TowerDefenceTest {
         Point end=new Point(0,0);
         areas.put(end, Areas.END);
         areas.put(new Point(1,1), Areas.BLOCKED);
-        areas.put(new Point(1,2), Areas.BLOCKED);
         areas.put(new Point(1,3), Areas.BLOCKED);
-        areas.put(new Point(1,4), Areas.BLOCKED);
         areas.put(new Point(1,5), Areas.BLOCKED);
-        areas.put(new Point(1,6), Areas.BLOCKED);
         areas.put(new Point(1,7), Areas.BLOCKED);
-        areas.put(new Point(2,1), Areas.BLOCKED);
         areas.put(new Point(3,1), Areas.BLOCKED);
         areas.put(new Point(3,3), Areas.BLOCKED);
-        areas.put(new Point(3,4), Areas.BLOCKED);
         areas.put(new Point(3,5), Areas.BLOCKED);
-        areas.put(new Point(3,6), Areas.BLOCKED);
-        areas.put(new Point(2,8), Areas.BLOCKED);
-        areas.put(new Point(3,8), Areas.BLOCKED);
-        areas.put(new Point(3,4), Areas.BLOCKED);
-        areas.put(new Point(1,4), Areas.BLOCKED);
-        areas.put(new Point(1,2), Areas.BLOCKED);
-
-        areas.put(new Point(7,1), Areas.BLOCKED);
-        areas.put(new Point(7,2), Areas.BLOCKED);
-        areas.put(new Point(7,3), Areas.BLOCKED);
-        areas.put(new Point(7,4), Areas.BLOCKED);
-        areas.put(new Point(7,5), Areas.BLOCKED);
-        areas.put(new Point(7,6), Areas.BLOCKED);
-        areas.put(new Point(7,7), Areas.BLOCKED);
-        areas.put(new Point(6,1), Areas.BLOCKED);
+        areas.put(new Point(3,7), Areas.BLOCKED);
         areas.put(new Point(5,1), Areas.BLOCKED);
         areas.put(new Point(5,3), Areas.BLOCKED);
-        areas.put(new Point(5,4), Areas.BLOCKED);
         areas.put(new Point(5,5), Areas.BLOCKED);
-        areas.put(new Point(5,6), Areas.BLOCKED);
-        areas.put(new Point(6,8), Areas.BLOCKED);
-        areas.put(new Point(5,8), Areas.BLOCKED);
-        areas.put(new Point(5,4), Areas.BLOCKED);
-        areas.put(new Point(7,4), Areas.BLOCKED);
-        areas.put(new Point(7,2), Areas.BLOCKED);
-
-        areas.put(new Point(9,2), Areas.BLOCKED);
-
-        areas.put(new Point(9,9), Areas.START);
-        instance = new TowerDefence(new SquareGrid(10, 10), areas);
+        areas.put(new Point(5,7), Areas.BLOCKED);
+        areas.put(new Point(7,1), Areas.BLOCKED);
+        areas.put(new Point(7,3), Areas.BLOCKED);
+        areas.put(new Point(7,5), Areas.BLOCKED);
+        areas.put(new Point(7,7), Areas.BLOCKED);
+        areas.put(new Point(8,8), Areas.START);
+        instance = new TowerDefence(new SquareGrid(9, 9), areas);
         
         Map<Point,Integer> choices=new HashMap<Point, Integer>();
         int n=10000;
         double error=Math.sqrt(n);
-        Point prev=new Point(9, 9);
-        Point curr=new Point(9, 8);
+        Point prev=new Point(8, 7);
+        Point curr=new Point(8, 6);
         Point next=null;
         System.out.println("Doing choices");
         for(int i=0;i<n;i++){
@@ -501,74 +409,82 @@ public class TowerDefenceTest {
             total+=entry.getValue();
         }
         assertEquals(total, n);
-        assertTrue(choices.get(new Point(9, 7))>0.6*n-error);
-        assertTrue(choices.get(new Point(9, 7))<0.6*n+error);
+        assertEquals(choices.size(),2);
+        assertTrue(choices.get(new Point(8, 5))>0.6*n-error);
+        assertTrue(choices.get(new Point(8, 5))<0.6*n+error);
         
         curr=null;
         prev=null;
-        next=new Point(9,9);
+        next=new Point(8,8);
         Map<Point,Integer> path2=new HashMap<Point, Integer>();
         int i=0;
         System.out.println(instance.index);
         while(!end.equals(curr)){
-            printDebug(instance.grid,instance.blockedPoints,next, instance.routes.get(end), path2,path2);
+            instance.printDebug('1',next, instance.routes.get(end), path2,path2);
             prev=curr;
             curr=next;
             next=instance.getNextPoint(end, curr, prev);
             path2.put(curr,i++);
             System.out.println(next);
         }
-        ArrayList<Point> blockable = new ArrayList<Point>(Arrays.asList(new Point[]{new Point(8,2),new Point(0,2),new Point(4,2),new Point(4,7)}));
-        ArrayList<Point> blocked=new ArrayList<Point>();
+        ArrayList<Point> blockable = new ArrayList<Point>(Arrays.asList(new Point[]{
+            new Point(0,1), new Point(0,3), new Point(0,5), new Point(0,7), new Point(1,0),
+            new Point(1,2), new Point(1,4), new Point(1,6), new Point(1,8), new Point(2,1),
+            new Point(2,3), new Point(2,5), new Point(2,7), new Point(3,0), new Point(3,2),
+            new Point(3,4), new Point(3,6), new Point(3,8), new Point(4,1), new Point(4,3),
+            new Point(4,5), new Point(4,7), new Point(5,0), new Point(5,2), new Point(5,4),
+            new Point(5,6), new Point(5,8), new Point(6,1), new Point(6,3), new Point(6,5),
+            new Point(6,7), new Point(7,0), new Point(7,2), new Point(7,4), new Point(7,6),
+            new Point(7,8), new Point(8,1), new Point(8,3), new Point(8,5), new Point(8,7)}));
+        HashSet<Point> blocked=new HashSet<Point>();
         
         curr=null;
         prev=null;
-        next=new Point(9,9);
+        next=new Point(8,8);
         path2.clear();
 
-        for(int j=0;j<200;j++){
-            if(Math.random()<0.5){
-                if(blockable.isEmpty())
-                    continue;
-                Collections.shuffle(blockable);
-                Point p=blockable.get(0);
+        int j=0;
+        while(j<10){
+            Collections.shuffle(blockable);
+            Point p=blockable.get(0);
+            
+            if(!blocked.contains(p)){
+                Set<Point> hilight=new HashSet<Point>();
+                hilight.add(p);hilight.add(curr);
+                instance.printDebug('1',hilight, instance.routes.get(end), path2,path2);
                 instance.blockedPoints.add(p);
                 Map<Point, MapUpdate<Point, Integer>> update = instance.updateRoutesBlocked(p);
-                if(update.get(end).removed(curr)||update.get(end).removed(new Point(9,9))){
+                if(update.get(end).removed(curr)||update.get(end).removed(new Point(8,8))){
                     instance.blockedPoints.remove(p);
                     continue;
                 }
                 update.get(end).update();
-                blockable.remove(0);
                 blocked.add(p);
-                printDebug(instance.grid,instance.blockedPoints,p, instance.routes.get(end), path2,path2);
+                instance.printDebug('1',hilight, instance.routes.get(end), path2,path2);
             }else{
-                if(blocked.isEmpty())
-                    continue;
-                Collections.shuffle(blocked);
-                Point p=blocked.get(0);
-                blocked.remove(0);
-                blockable.add(p);
+                Set<Point> hilight=new HashSet<Point>();
+                hilight.add(p);hilight.add(curr);
+                instance.printDebug('1',hilight, instance.routes.get(end), path2,path2);
+                blocked.remove(p);
                 instance.blockedPoints.remove(p);
                 instance.updateRoutesUnblocked(p);
-                printDebug(instance.grid,instance.blockedPoints,p, instance.routes.get(end), path2,path2);
+                instance.printDebug('1',hilight, instance.routes.get(end), path2,path2);
             }
-            for(int k=0;k<3;k++){
-                if(end.equals(curr)||curr==null){
-                    curr=null;
-                    prev=null;
-                    next=new Point(9,9);
-                    path2.clear();
-                    i=0;
-                }else{
-                    next=instance.getNextPoint(end, curr, prev);
-                }
-                prev=curr;
-                curr=next;
-                path2.put(curr,i++);
-                System.out.println(curr);
-                printDebug(instance.grid,instance.blockedPoints,next, instance.routes.get(end), path2,path2);
+            if(end.equals(curr)||curr==null){
+                curr=null;
+                prev=null;
+                next=new Point(8,8);
+                path2.clear();
+                i=0;
+                j++;
+            }else{
+                next=instance.getNextPoint(end, curr, prev);
             }
+            prev=curr;
+            curr=next;
+            path2.put(curr,i++);
+            System.out.println(curr);
+            instance.printDebug('1',next, instance.routes.get(end), path2,path2);
         }
     }
 }

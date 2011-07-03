@@ -11,7 +11,10 @@ import java.awt.Point;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -101,7 +105,7 @@ public final class TowerDefence {
         }
     };
     
-    private String filebase = "outA";
+    private String filebase = "out_"+new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS").format(new Date()) ;
     int index = 0;
     /**
      * outputs the data from the route planning to a file as:
@@ -112,26 +116,32 @@ public final class TowerDefence {
      * @param rhs
      * @param U
      */
-    void printDebug(Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
+    void printDebug(char key,Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
+        printDebug(key, Collections.singleton(hilight), route, rhs, U);
+    }
+    void printDebug(char key,Set<Point> hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
         if (!true) {
             return;
         }
         try {
             BufferedWriter out;
-            out = new BufferedWriter(new FileWriter(filebase + index + ".txt"));
+            out = new BufferedWriter(new FileWriter(filebase +"_"+ index + ".tdd"));
+            out.write(key);
+            out.write("\n");
             for (Point point : grid) {
                 if (!grid.isValid(point)) {
                     System.out.println("YARG");
                 }
                 out.write(point.x + " " + point.y + "\t");
-                int type = 1;
+                int type = 0;
                 if (blockedPoints.contains(point)) {
-                    type = 0;
-                } else if (U.containsKey(point)) {
-                    type = 2;
+                    type +=1;
                 }
-                if (point.x == hilight.x && point.y == hilight.y) {
-                    type += 3;
+                if (U.containsKey(point)) {
+                    type +=2;
+                }
+                if (hilight.contains(point)) {
+                    type +=4;
                 }
                 out.write("" + type + " ");
 
@@ -251,7 +261,7 @@ public final class TowerDefence {
                 }
                 UpdateVertex(route, rhs, Ul, Um, p);
             }
-            printDebug(p, route, rhs, Um);
+            printDebug('0',p, route, rhs, Um);
         }
     }
 
@@ -260,7 +270,7 @@ public final class TowerDefence {
         rhs.put(p_end, 0);
         Ul.add(new TwoItems<Integer, Point>(0, p_end));
         Um.put(p_end, 0);
-        printDebug(p_end, route, rhs, Um);
+        printDebug('0',p_end, route, rhs, Um);
         ComputePath(p_end, route, rhs, Ul, Um);
     }
 
@@ -274,8 +284,8 @@ public final class TowerDefence {
         blockedPoints.add(blockedPoint);
         newRhs.remove(blockedPoint);
         UpdateVertex(newRoute, newRhs, Ul, Um, blockedPoint);
-        printDebug(blockedPoint, route, rhs, Um);
-        ComputePath(p_end, newRoute, rhs, Ul, Um);
+        printDebug('0',blockedPoint, newRoute, newRhs, Um);
+        ComputePath(p_end, newRoute, newRhs, Ul, Um);
         return routeUpdate;
     }
 
@@ -293,7 +303,7 @@ public final class TowerDefence {
             rhs.put(unblockedPoint, new_rhs);
         }
         UpdateVertex(route, rhs, Ul, Um, unblockedPoint);
-        printDebug(unblockedPoint, route, rhs, Um);
+        printDebug('0',unblockedPoint, route, rhs, Um);
         ComputePath(p_end, route, rhs, Ul, Um);
     }
     
