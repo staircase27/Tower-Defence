@@ -4,9 +4,12 @@
  */
 package com.staircase27.TD.lib.Enemies;
 
+import com.staircase27.TD.lib.TowerDefence;
 import com.staircase27.TD.lib.Towers.DamagingTower;
+import com.staircase27.TD.lib.lib.TwoItems;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.util.LinkedList;
 
 /**
  *
@@ -16,6 +19,8 @@ public abstract class BaseEnemy {
 
     //the current location in cartesian space
     private Point2D.Double location = null;
+    //the locations this enemy has been in the last time step by time
+    LinkedList<TwoItems<Double,Point2D.Double>> path=new LinkedList<TwoItems<Double, Point2D.Double>> (); 
     //the label for the point in grid space this is traveling from
     private Point from = null;
     //the label for the point in grid space this is traveling to
@@ -49,15 +54,17 @@ public abstract class BaseEnemy {
     private double damageRate=0;
     //the rate of damage being applied by area effect or laser towers
     private double damageSpeedRate=0;
+    private final Point target;
 
     
-    public BaseEnemy(double baseHP,double baseSpeed){
-        this(baseHP, baseSpeed, 0);
+    public BaseEnemy(double baseHP,double baseSpeed,Point target){
+        this(baseHP, baseSpeed, 0, target);
     }
-    public BaseEnemy(double baseHP,double baseSpeed,double baseShield){
+    public BaseEnemy(double baseHP,double baseSpeed,double baseShield,Point target){
         this.speed=this.maxSpeed=this.baseSpeed=baseSpeed;
         this.HP=this.baseHP=baseHP;
         this.shield=this.baseShield=baseShield;
+        this.target = target;
     }
     
     /**
@@ -153,7 +160,7 @@ public abstract class BaseEnemy {
     }
     
     
-    public final boolean update(double timeStep){
+    public final boolean updateDamage(double timeStep){
         if(getDamageSpeedRate()>0){
             setSpeed(getSpeed()-getDamageSpeedRate()*timeStep);
             speedDelay=SPEEDDELAY;
@@ -200,6 +207,37 @@ public abstract class BaseEnemy {
         }
     }
 
+    public final boolean updateMove(TowerDefence towerDefence,double timeStep){
+        double speed=getSpeed();
+        double totalDistance=timeStep*speed;
+        double distance=totalDistance;
+        this.path.add(new TwoItems<Double, Point2D.Double>(0.0, location));
+        while(distance>0){
+            Point2D.Double toLocation=towerDefence.grid.getPointLocation(to);
+            double toDistance=toLocation.distance(location);
+            if(distance>toDistance){
+                distance-=toDistance;
+                location=toLocation;
+                Point old=from;
+                if(getTarget().equals(to)){
+                    this.path.add(new TwoItems<Double, Point2D.Double>((totalDistance-distance)/speed, location));
+                    return true;
+                }else{
+                    this.path.add(new TwoItems<Double, Point2D.Double>((totalDistance-distance)/speed, location));
+                    from=to;
+                    to=towerDefence.getNextPoint(getTarget(), from, old);
+                }
+            }else{
+                location=new Point2D.Double(location.x+(toLocation.x-location.x)*distance/toDistance, 
+                                            location.y+(toLocation.y-location.y)*distance/toDistance);
+                distance=0;
+                this.path.add(new TwoItems<Double, Point2D.Double>(timeStep, location));
+            }
+        }
+        return false;
+    }
+    
+    
     public double getHP() {
         return HP;
     }
@@ -282,5 +320,9 @@ public abstract class BaseEnemy {
 
     public double getDamageSpeedRate() {
         return damageSpeedRate;
+    }
+
+    public Point getTarget() {
+        return target;
     }
 }

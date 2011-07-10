@@ -4,8 +4,8 @@
  */
 package com.staircase27.TD.lib.Enemies;
 
-import com.staircase27.TD.lib.Towers.BaseMissileTower;
 import com.staircase27.TD.lib.Towers.DamagingTower;
+import java.awt.Point;
 
 /**
  *
@@ -13,8 +13,8 @@ import com.staircase27.TD.lib.Towers.DamagingTower;
  */
 public class ShieldedEnemy extends BaseEnemy{
     
-    public ShieldedEnemy(double level){
-        super(level/2, 1, level/2);
+    public ShieldedEnemy(double level, Point target){
+        super(level/2, 1, level/2,target);
     }
 
     @Override

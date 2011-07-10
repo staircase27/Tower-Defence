@@ -5,14 +5,15 @@
 package com.staircase27.TD.lib.Enemies;
 
 import com.staircase27.TD.lib.Towers.DamagingTower;
+import java.awt.Point;
 
 /**
  *
  * @author Simon Armstrong
  */
 public class BasicEnemy extends BaseEnemy{
-    public BasicEnemy(double level){
-        super(level,1);
+    public BasicEnemy(double level,Point target){
+        super(level,1,target);
     }
 
     @Override
