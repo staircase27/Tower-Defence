@@ -15,7 +15,7 @@ import com.staircase27.TD.lib.lib.Pair;
 public class PoisonTower extends BaseMissileTower{
 
     public PoisonTower(){
-        super(3 ,1.1, Type.BULLET, 0.5);
+        super(3 ,1.1, 0.5);
     }
 
     @Override

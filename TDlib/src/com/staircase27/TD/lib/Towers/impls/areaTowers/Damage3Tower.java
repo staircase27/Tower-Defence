@@ -6,7 +6,7 @@ package com.staircase27.TD.lib.Towers.impls.areaTowers;
 
 import com.staircase27.TD.lib.Enemies.BaseEnemy;
 import com.staircase27.TD.lib.Towers.AreaTowerInterface;
-import com.staircase27.TD.lib.Towers.BaseMissileTower;
+import com.staircase27.TD.lib.Towers.BaseAttackTower;
 import com.staircase27.TD.lib.Towers.BaseTower;
 import com.staircase27.TD.lib.Towers.DamagingTower;
 import com.staircase27.TD.lib.lib.Pair;
@@ -43,14 +43,14 @@ public class Damage3Tower extends DamagingTower implements AreaTowerInterface{
     }
     
     @Override
-    public void activateTower(Set<BaseEnemy> enemies, Set<BaseMissileTower> towers) {
+    public void activateTower(Set<BaseEnemy> enemies, Set<BaseAttackTower> towers) {
         for(BaseEnemy enemy:enemies){
             enterArea(enemy);
         }
     }
 
     @Override
-    public void disactivateTower(Set<BaseEnemy> enemies, Set<BaseMissileTower> towers) {
+    public void disactivateTower(Set<BaseEnemy> enemies, Set<BaseAttackTower> towers) {
         for(BaseEnemy enemy:enemies){
             leaveArea(enemy);
         }

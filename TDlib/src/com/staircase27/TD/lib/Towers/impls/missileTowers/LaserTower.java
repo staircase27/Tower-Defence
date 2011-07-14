@@ -4,7 +4,7 @@
  */
 package com.staircase27.TD.lib.Towers.impls.missileTowers;
 
-import com.staircase27.TD.lib.Towers.BaseMissileTower;
+import com.staircase27.TD.lib.Towers.BaseLaserTower;
 import com.staircase27.TD.lib.Towers.BaseTower;
 import com.staircase27.TD.lib.lib.Pair;
 
@@ -12,10 +12,10 @@ import com.staircase27.TD.lib.lib.Pair;
  *
  * @author Simon Armstrong
  */
-public class LaserTower extends BaseMissileTower{
+public class LaserTower extends BaseLaserTower{
 
     public LaserTower(){
-        super(1, 1, Type.LASER, 1);
+        super(1, 1, 1);
     }
 
     @Override

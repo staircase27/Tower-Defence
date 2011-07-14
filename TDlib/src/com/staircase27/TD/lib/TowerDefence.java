@@ -6,6 +6,7 @@ package com.staircase27.TD.lib;
 
 import com.staircase27.TD.lib.Enemies.BaseEnemy;
 import com.staircase27.TD.lib.Towers.AreaTowerInterface;
+import com.staircase27.TD.lib.Towers.BaseAttackTower;
 import com.staircase27.TD.lib.Towers.BaseTower;
 import com.staircase27.TD.lib.Waves.Wave;
 import com.staircase27.TD.lib.Waves.Waves;
@@ -89,8 +90,8 @@ public final class TowerDefence {
         return routing.getNextPoint(target, curr, prev);
     }
 
-    public boolean addTower(BaseTower tower, Point point) {
-        Map<Point, MapUpdate<Point, Integer>> updates = routing.updateRoutesBlocked(point);
+    public boolean addTower(BaseTower tower) {
+        Map<Point, MapUpdate<Point, Integer>> updates = routing.updateRoutesBlocked(tower.getLocation());
         MapUpdate<Point, Integer> update = null;
         for (Point end : endsMap.keySet()) {
             update = updates.get(end);
@@ -109,24 +110,29 @@ public final class TowerDefence {
             return false;
         }
         update.update();
-        towers.put(point, tower);
+        towers.put(tower.getLocation(), tower);
         if(tower instanceof AreaTowerInterface){
-            ((AreaTowerInterface)tower).activateTower(null, null);
+            ((AreaTowerInterface)tower).activateTower(getEnemiesInRange(tower), null);
         }
         return true;
     }
 
-    public BaseTower replaceTower(BaseTower tower, Point point) {
-        if (towers.containsKey(point)) {
-            return towers.put(point, tower);
+    public BaseTower replaceTower(BaseTower tower) {
+        if (towers.containsKey(tower.getLocation())) {
+            return towers.put(tower.getLocation(), tower);
         } else {
             return null;
         }
     }
 
-    public BaseTower removeTower(Point point) {
-        routing.updateRoutesUnblocked(point);
-        return towers.remove(point);
+    public boolean removeTower(BaseTower tower) {
+        if(towers.containsKey(tower.getLocation())&&towers.get(tower.getLocation())==tower){
+            towers.remove(tower.getLocation());
+            routing.updateRoutesUnblocked(tower.getLocation());
+            return true;
+        }else{
+            return false;
+        }
     }
     
     public void spawnEnemy(BaseEnemy enemy,Point start){
@@ -165,10 +171,15 @@ public final class TowerDefence {
                 }
             }
 
+            //calculate tower movements
+            for(BaseTower tower:towers.values()){
+                if(tower instanceof BaseAttackTower){
+                    ((BaseAttackTower)tower).update(this, timeStep);
+                }
+            }
+            
             //TODO all other update code
             //calculate bullet movements and do bullet damage
-            
-            //calculate laser movements
             
             //calculate laser hits
             
@@ -182,4 +193,17 @@ public final class TowerDefence {
             }
         }
     }
+
+    public Set<BaseEnemy> getEnemiesInRange(BaseTower tower) {
+        return getEnemiesInRange(tower, 0);
+    }
+
+    public Set<BaseEnemy> getEnemiesInRange(BaseTower tower, double time) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public TwoItems<Double,BaseEnemy> getNextEnemyInRange(BaseTower tower, double time) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
 }

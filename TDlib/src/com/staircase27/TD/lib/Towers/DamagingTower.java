@@ -4,6 +4,8 @@
  */
 package com.staircase27.TD.lib.Towers;
 
+import java.awt.Point;
+
 /**
  *
  * @author Simon Armstrong
@@ -26,7 +28,8 @@ public abstract class DamagingTower extends BaseTower {
     private final DamageTarget damageTarget;
     private final DamageShieldType damageShieldType;
 
-    public DamagingTower(double baseDamage, DamageTarget damageTarget, DamageShieldType damageShieldType){
+    public DamagingTower(Point location, double baseDamage, DamageTarget damageTarget, DamageShieldType damageShieldType){
+        super(location);
         this.damage = this.baseDamage = baseDamage;
         this.damageTarget = damageTarget;
         this.damageShieldType = damageShieldType;

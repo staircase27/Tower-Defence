@@ -6,10 +6,9 @@ package com.staircase27.TD.lib.Enemies;
 
 import com.staircase27.TD.lib.TowerDefence;
 import com.staircase27.TD.lib.Towers.DamagingTower;
-import com.staircase27.TD.lib.lib.TwoItems;
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.util.LinkedList;
+import java.util.TreeMap;
 
 /**
  *
@@ -20,7 +19,7 @@ public abstract class BaseEnemy {
     //the current location in cartesian space
     private Point2D.Double location = null;
     //the locations this enemy has been in the last time step by time
-    LinkedList<TwoItems<Double,Point2D.Double>> path=new LinkedList<TwoItems<Double, Point2D.Double>> (); 
+    private TreeMap<Double,Point2D.Double> path=new TreeMap<Double, Point2D.Double>(); 
     //the label for the point in grid space this is traveling from
     private Point from = null;
     //the label for the point in grid space this is traveling to
@@ -211,7 +210,8 @@ public abstract class BaseEnemy {
         double speed=getSpeed();
         double totalDistance=timeStep*speed;
         double distance=totalDistance;
-        this.path.add(new TwoItems<Double, Point2D.Double>(0.0, location));
+        this.getPath().clear();
+        this.getPath().put(0.0, location);
         while(distance>0){
             Point2D.Double toLocation=towerDefence.grid.getPointLocation(to);
             double toDistance=toLocation.distance(location);
@@ -219,11 +219,10 @@ public abstract class BaseEnemy {
                 distance-=toDistance;
                 location=toLocation;
                 Point old=from;
+                this.getPath().put((totalDistance-distance)/speed, location);
                 if(getTarget().equals(to)){
-                    this.path.add(new TwoItems<Double, Point2D.Double>((totalDistance-distance)/speed, location));
                     return true;
                 }else{
-                    this.path.add(new TwoItems<Double, Point2D.Double>((totalDistance-distance)/speed, location));
                     from=to;
                     to=towerDefence.getNextPoint(getTarget(), from, old);
                 }
@@ -231,7 +230,7 @@ public abstract class BaseEnemy {
                 location=new Point2D.Double(location.x+(toLocation.x-location.x)*distance/toDistance, 
                                             location.y+(toLocation.y-location.y)*distance/toDistance);
                 distance=0;
-                this.path.add(new TwoItems<Double, Point2D.Double>(timeStep, location));
+                this.getPath().put(timeStep, location);
             }
         }
         return false;
@@ -324,5 +323,9 @@ public abstract class BaseEnemy {
 
     public Point getTarget() {
         return target;
+    }
+
+    public TreeMap<Double,Point2D.Double> getPath() {
+        return path;
     }
 }

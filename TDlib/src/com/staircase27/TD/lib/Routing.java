@@ -27,16 +27,37 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *
+ * This class implements the incremental routing calculations for the tower defence.
+ * The algorithm used is D* Lite, optimised version (Fig 4), from Proceedings 
+ * of the AAAI Conference on Artificial Intelligence (AAAI), pages 476-483, 2002
+ * by S. Koenig and M. Likhachev. <a href="http://www.aaai.org/Papers/AAAI/2002/AAAI02-072.pdf">
+ * http://www.aaai.org/Papers/AAAI/2002/AAAI02-072.pdf</a> or 
+ * <a href="http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf">
+ * http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf</a>
+ * 
+ * This class doesn't use a heuristics and iterates till all possible cells have 
+ * their routes calculated.
+ * 
+ * It implements the open set using both a HashMap and a Sorted Set. When a point
+ * is added to the open set it is added to both the map and sorted set. When
+ * a point is updated or removed it is not removed from the list but only updated
+ * in the map and when a point is removed from sorted set it is checked against 
+ * the map to see if it is a valid entry. This idea is copied from 
+ * <a href="http://code.google.com/p/dstarlite/">
+ * http://code.google.com/p/dstarlite/</a>
+ * 
+ * The route selection is at random from all the shortest paths with a higher
+ * propability for routes nearer to straight on.
  * @author Simon Armstrong
  */
-public class Routing {
+public final class Routing {
 
     /**
-     * creates a new routing object
-     * @param grid
-     * @param blockedPoints
-     * @param ends
+     * creates a new routing object.
+     * 
+     * @param grid the grid we are travelling around
+     * @param blockedPoints the set of points that are blocked at the start
+     * @param ends the set of all the end points
      */
     public Routing(Grid grid, HashSet<Point> blockedPoints, Set<Point> ends) {
         this.grid = grid;
@@ -49,15 +70,18 @@ public class Routing {
         }
     }
     /**
-     * 
+     * The grid this routing uses
      */
     public final Grid grid;
+    /**The set of blocked point. This is updated while the code runs*/
     HashSet<Point> blockedPoints;
+    /**A Map of the rhs values for all the points. Infinity is represented by not being present in the map*/
     HashMap<Point, HashMap<Point, Integer>> rhss;
+    /**A Map of the g values for all the points. Infinity is represented by not being present in the map*/
     HashMap<Point, HashMap<Point, Integer>> routes;
 
     /**
-     * 
+     * generate the initial routes for the end points and blocked points on the grid for this routing object.
      */
     public void generateRoutes() {
         for (Point end : routes.keySet()) {
@@ -67,13 +91,14 @@ public class Routing {
 
     /**
      * Calculate the new routes and return changes to be either accepted or rejected.
+     * 
      * NOTE: The returned map updates are all linked together!
-     * @param blocked
+     * @param blocked the point that is being blocked
      * @return A Map of the MapUpdate Objects for the updated routes. 
      */
     public Map<Point, MapUpdate<Point, Integer>> updateRoutesBlocked(Point blocked) {
-        SetUpdate<Point> blockedPointsUpdate = new SetUpdate(blockedPoints);
-        Set<Point> newBlockedPoints = blockedPointsUpdate.getSet();
+        SetUpdate<Point> blockedPointsUpdate = new SetUpdate<Point>(blockedPoints);
+        Set<Point> newBlockedPoints = blockedPointsUpdate.getView();
         newBlockedPoints.add(blocked);
         Map<Point, MapUpdate<Point, Integer>> updates = new HashMap<Point, MapUpdate<Point, Integer>>();
         for (Point end : routes.keySet()) {
@@ -84,8 +109,8 @@ public class Routing {
     }
 
     /**
-     * 
-     * @param unblocked
+     * calculate the new routes.
+     * @param unblocked the point that is being unblocked
      */
     public void updateRoutesUnblocked(Point unblocked) {
         blockedPoints.remove(unblocked);
@@ -93,14 +118,23 @@ public class Routing {
             updateRouteUnblocked(unblocked, end, routes.get(end), rhss.get(end));
         }
     }
+    
+    /**A random number generator for route choosing*/
     private Random rand = new Random();
 
     /**
+     * Get the next point in the route from current to target.
      * 
-     * @param target
-     * @param current
-     * @param previous
-     * @return
+     * This chooses a point at random from all the shortest routes.
+     * The probability of each next point is weighted by how close the next 
+     * point is to going straight on if there is a previous point or even choice
+     * otherwise. The straightness of the route is measured using 
+     * {@link Grid#getStrightness(java.awt.Point, java.awt.Point, java.awt.Point)}.
+     * The Random choice is done by a {@link Random} object in this class.
+     * @param target the point we are trying to get to
+     * @param current the current position
+     * @param previous the previous position to use for weighting
+     * @return the next point to travel to.
      */
     public Point getNextPoint(Point target, Point current, Point previous) {
         List<TwoItems<Double, Point>> nexts = new LinkedList<TwoItems<Double, Point>>();
@@ -127,23 +161,38 @@ public class Routing {
         }
         return null;
     }
+    
+    /**a flag to enable debuging*/
     boolean DEBUG = true;
+    /**the base filename for the debug output*/
     String filebase = "out_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS").format(new Date());
+    /**the output index which is appended to the file name for debug output*/
     int index = 0;
 
     /**
      * outputs the data from the route planning to a file as:
      * x y \t type \t distance \t rhs
-     * where type is 0 if blocked, 2 if on the U list and 1 otherwise or the above +3 if hilighted.
-     * @param hilight
-     * @param route
-     * @param rhs
-     * @param U
+     * where type is bit flags for blocked points (1), open set (2) and hilight (3)
+     * or whatever is passed as those arguments.
+     * @param hilight a point to hilight
+     * @param route the route values
+     * @param rhs the rhs values
+     * @param U the open set
      */
     void printDebug(char key, Point hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
         printDebug(key, Collections.singleton(hilight), route, rhs, U);
     }
 
+    /**
+     * outputs the data from the route planning to a file as:
+     * x y \t type \t distance \t rhs
+     * where type is bit flags for blocked points (1), open set (2) and hilight (3)
+     * or whatever is passed as those arguments.
+     * @param hilight points to hilight
+     * @param route the route values
+     * @param rhs the rhs values
+     * @param U the open set
+     */
     void printDebug(char key, Set<Point> hilight, Map<Point, Integer> route, Map<Point, Integer> rhs, Map<Point, Integer> U) {
         if (!DEBUG) {
             return;
@@ -189,7 +238,9 @@ public class Routing {
         index++;
     }
     /**
+     * A comparator for the entries in the open set.
      * 
+     * Sorts points by key integer and then x coordinate then y coordinate
      */
     public static final Comparator<TwoItems<Integer, Point>> comparator = new Comparator<TwoItems<Integer, Point>>() {
 
@@ -205,9 +256,19 @@ public class Routing {
             return value;
         }
     };
+    /**The sorted set part of the open set implementation*/
     private TreeSet<TwoItems<Integer, Point>> Ul = new TreeSet<TwoItems<Integer, Point>>(comparator);
+    /**The map part of the open set implementation*/
     private HashMap<Point, Integer> Um = new HashMap<Point, Integer>();
 
+    /**
+     * Updates a points value in the open set
+     * @param route the g values
+     * @param rhs the rhs values
+     * @param Ul the sorted set part of the open set
+     * @param Um the map part of the open set
+     * @param p the point to update
+     */
     private void UpdateVertex(Map<Point, Integer> route, Map<Point, Integer> rhs, TreeSet<TwoItems<Integer, Point>> Ul, Map<Point, Integer> Um, Point p) {
         if (route.containsKey(p)) {
             if ((!rhs.containsKey(p)) || route.get(p) != rhs.get(p)) {
@@ -231,6 +292,15 @@ public class Routing {
         }
     }
 
+    /**
+     * Calculates the paths.
+     * @param p_end the end point the paths are being calculated for.
+     * @param blockedPoints the points that are currently blocked
+     * @param route the g values
+     * @param rhs the rhs values
+     * @param Ul the sorted set part of the open set
+     * @param Um the map part of the open set
+     */
     private void ComputePath(Point p_end, Set<Point> blockedPoints, Map<Point, Integer> route, Map<Point, Integer> rhs, TreeSet<TwoItems<Integer, Point>> Ul, Map<Point, Integer> Um) {
         while (!Ul.isEmpty()) {
             TwoItems<Integer, Point> entry = Ul.pollFirst();
@@ -304,8 +374,15 @@ public class Routing {
         }
     }
 
+    /**
+     * Calculates the route for an end point.
+     * 
+     * Used by {@link #generateRoutes()}.
+     * @param p_end the end point we are calculating routes for
+     * @param route the g values for this end point
+     * @param rhs the rhs values for this point
+     */
     void generateRoute(Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
-        //the g and rhs values of all the points in the grid. not present is infinity.
         rhs.put(p_end, 0);
         Ul.add(new TwoItems<Integer, Point>(0, p_end));
         Um.put(p_end, 0);
@@ -313,12 +390,24 @@ public class Routing {
         ComputePath(p_end, blockedPoints, route, rhs, Ul, Um);
     }
 
+    /**
+     * Updates a route when a point is blocked for an end point and returns a 
+     * MapUpdate so the new route could be accepted or rejected.
+     * 
+     * Used by {@link #updateRoutesBlocked(java.awt.Point)}.
+     * @param p_end the end point we are calculating routes for
+     * @param route the g values for this end point
+     * @param rhs the rhs values for this point
+     * @param blockedPoint the point that is blocked
+     * @param newBlockedPoints the new blockedPoints 
+     * @return the MapUpdate to be either rejected or accepted
+     */
     MapUpdate<Point, Integer> updateRouteBlocked(Point blockedPoint, Set<Point> newBlockedPoints, Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
         //records the updates to the route so can choose to accept or reject
         MapUpdate<Point, Integer> routeUpdate = new MapUpdate<Point, Integer>(route);
-        Map<Point, Integer> newRoute = routeUpdate.getMap();
+        Map<Point, Integer> newRoute = routeUpdate.getView();
         MapUpdate<Point, Integer> rhsUpdate = new MapUpdate<Point, Integer>(rhs, routeUpdate);
-        Map<Point, Integer> newRhs = rhsUpdate.getMap();
+        Map<Point, Integer> newRhs = rhsUpdate.getView();
         newRhs.remove(blockedPoint);
         UpdateVertex(newRoute, newRhs, Ul, Um, blockedPoint);
         printDebug('0', blockedPoint, newRoute, newRhs, Um);
@@ -326,6 +415,16 @@ public class Routing {
         return routeUpdate;
     }
 
+    /**
+     * Updates a route when a point is unblocked for an end point.
+     * 
+     * The blocked points set must be updated before this is called.
+     * Used by {@link #updateRoutesUnblocked(java.awt.Point)}
+     * @param unblockedPoint the unblocked point
+     * @param p_end the end point to update the routes for
+     * @param route the g values
+     * @param rhs the rhs values
+     */
     void updateRouteUnblocked(Point unblockedPoint, Point p_end, Map<Point, Integer> route, Map<Point, Integer> rhs) {
         int new_rhs = Integer.MAX_VALUE;
         for (Point n : grid.getNeighbours(unblockedPoint)) {

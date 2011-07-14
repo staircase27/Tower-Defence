@@ -15,6 +15,6 @@ public interface AreaTowerInterface {
     public double getRange();
     public void enterArea(BaseEnemy enemy);
     public void leaveArea(BaseEnemy enemy);
-    public void activateTower(Set<BaseEnemy> enemies,Set<BaseMissileTower> towers);
-    public void disactivateTower(Set<BaseEnemy> enemies,Set<BaseMissileTower> towers);
+    public void activateTower(Set<BaseEnemy> enemies,Set<BaseAttackTower> towers);
+    public void disactivateTower(Set<BaseEnemy> enemies,Set<BaseAttackTower> towers);
 }

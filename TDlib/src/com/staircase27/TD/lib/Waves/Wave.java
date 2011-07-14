@@ -54,7 +54,7 @@ public final class Wave {
         return waveElement;
     }
     
-    public Set<TwoItems<Class<? extends BaseEnemy>, Integer>> getAllEnemies(){
+    public Set<TwoItems<Class<? extends BaseEnemy>, Double>> getAllEnemies(){
         return waveElement.getAllEnemies();
     }
     public Set<Pair<Point>> getAllRoutes(){

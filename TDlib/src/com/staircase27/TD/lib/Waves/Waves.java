@@ -27,8 +27,8 @@ public final class Waves {
         return waves;
     }
 
-    public final Set<TwoItems<Class<? extends BaseEnemy>, Integer>> getAllEnemies() {
-        Set<TwoItems<Class<? extends BaseEnemy>, Integer>> enemies=new HashSet<TwoItems<Class<? extends BaseEnemy>, Integer>>();
+    public final Set<TwoItems<Class<? extends BaseEnemy>, Double>> getAllEnemies() {
+        Set<TwoItems<Class<? extends BaseEnemy>, Double>> enemies=new HashSet<TwoItems<Class<? extends BaseEnemy>, Double>>();
         for(Wave wave:waves){
             enemies.addAll(wave.getAllEnemies());
         }

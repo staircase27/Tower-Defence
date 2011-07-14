@@ -15,7 +15,7 @@ import com.staircase27.TD.lib.lib.Pair;
 public class SmartTower extends BaseMissileTower{
 
     public SmartTower(){
-        super(0.125 ,4, Type.BULLET, 10);
+        super(0.125 ,4 , 10);
     }
 
     @Override

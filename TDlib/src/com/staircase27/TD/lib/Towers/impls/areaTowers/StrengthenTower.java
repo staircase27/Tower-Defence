@@ -6,7 +6,7 @@ package com.staircase27.TD.lib.Towers.impls.areaTowers;
 
 import com.staircase27.TD.lib.Enemies.BaseEnemy;
 import com.staircase27.TD.lib.Towers.AreaTowerInterface;
-import com.staircase27.TD.lib.Towers.BaseMissileTower;
+import com.staircase27.TD.lib.Towers.BaseAttackTower;
 import com.staircase27.TD.lib.Towers.BaseTower;
 import com.staircase27.TD.lib.lib.Pair;
 import java.util.Set;
@@ -38,15 +38,15 @@ public class StrengthenTower extends BaseTower implements AreaTowerInterface{
     }
 
     @Override
-    public void activateTower(Set<BaseEnemy> enemies, Set<BaseMissileTower> towers) {
-        for(BaseMissileTower tower:towers){
+    public void activateTower(Set<BaseEnemy> enemies, Set<BaseAttackTower> towers) {
+        for(BaseAttackTower tower:towers){
             tower.adjustDamage(true, BOOST);
         }
     }
 
     @Override
-    public void disactivateTower(Set<BaseEnemy> enemies, Set<BaseMissileTower> towers) {
-        for(BaseMissileTower tower:towers){
+    public void disactivateTower(Set<BaseEnemy> enemies, Set<BaseAttackTower> towers) {
+        for(BaseAttackTower tower:towers){
             tower.adjustDamage(false, BOOST);
         }
     }

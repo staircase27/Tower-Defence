@@ -15,7 +15,7 @@ import com.staircase27.TD.lib.lib.Pair;
 public class ScatterTower extends BaseMissileTower{
 
     public ScatterTower(){
-        super(100 ,1.2, Type.BULLET, 0.1);
+        super(100 ,1.2 ,0.1);
     }
 
     @Override

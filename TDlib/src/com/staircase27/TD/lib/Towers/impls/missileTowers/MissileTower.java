@@ -15,7 +15,7 @@ import com.staircase27.TD.lib.lib.Pair;
 public class MissileTower extends BaseMissileTower {
 
     public MissileTower(){
-        super(1, 1, Type.BULLET, 1);
+        super(1, 1, 1);
     }
     @Override
     public Pair<Class<? extends BaseTower>> getUpgrades() {
